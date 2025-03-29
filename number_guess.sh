@@ -38,8 +38,17 @@ do
     elif [[ $NUMBER_GUESSED > $RAND ]]; then
       echo "It's lower than that, guess again:"
     else
-      echo "You guessed it in $NUMBER_OF_GUESSES tries. The secret number was $RAND. Nice job!"
+
       COMPLETED=1
+      GAMES_PLAYED=$((GAMES_PLAYED + 1))
+      #echo "number_of_guesses: $NUMBER_OF_GUESSES best_game: $BEST_GAME"
+      if [[ -z $BEST_GAME || $NUMBER_OF_GUESSES < $BEST_GAME ]]
+      then
+        BEST_GAME=$((NUMBER_OF_GUESSES))
+        UPDATE_BEST_GAME=$($PSQL "UPDATE users SET best_game=$BEST_GAME WHERE name='$USERNAME'")
+      fi
+      UPDATE_GAMES_PLAYED=$($PSQL "UPDATE users SET games_played=$GAMES_PLAYED WHERE name='$USERNAME'")
+      echo "You guessed it in $NUMBER_OF_GUESSES tries. The secret number was $RAND. Nice job!"
     fi
   else
     echo "That is not an integer, guess again:"
